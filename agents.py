@@ -32,6 +32,10 @@ class agent:
         self.id = 0
         self.coordinates = p  # as in meters
         self.direction = dir  # as in radian, x axis dir equal zero
+        self.neck = 0.15
+        self.head = self.coordinates + \
+            position(self.neck*cos(self.direction),
+                     self.neck*sin(self.direction))
 
     def step(self, v, w, dt):
         # print(str(self.id)+'s vel length: '+str(v.length))
@@ -45,3 +49,6 @@ class agent:
             self.direction = self.direction-2*pi
         while self.direction < -pi:
             self.direction = self.direction+2*pi
+        self.head = self.coordinates + \
+            position(self.neck*cos(self.direction),
+                     self.neck*sin(self.direction))

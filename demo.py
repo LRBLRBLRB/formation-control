@@ -23,14 +23,19 @@ class magui:
         x = [a.coordinates.x for a in self.formation.graph.agents]
         y = [a.coordinates.y for a in self.formation.graph.agents]
         self.aniagents, = self.ax.plot(x, y, 'ro', ms=8)
+        xh = [a.head.x for a in self.formation.graph.agents]
+        yh = [a.head.y for a in self.formation.graph.agents]
+        self.aniagentshead, = self.ax.plot(xh, yh, 'bo', ms=3)
         self.linc, = self.ax.plot([])
-        return self.aniagents, self.linc,
+        return self.aniagents, self.linc, self.aniagentshead,
 
     def updateAnimation(self, frame):
-        self.formation.servo(self.formation.target, delta=3, k1=0.5, k2=1)
+        self.formation.servo(self.formation.target, delta=10, k1=0.2, k2=0.3)
         self.formation.printPos(self.size)
         x = [a.coordinates.x for a in self.formation.graph.agents]
         y = [a.coordinates.y for a in self.formation.graph.agents]
+        xh = [a.head.x for a in self.formation.graph.agents]
+        yh = [a.head.y for a in self.formation.graph.agents]
         size = self.formation.graph.adjmatrix.shape
         xsegs = []
         ysegs = []
@@ -41,9 +46,10 @@ class magui:
                                   self.formation.graph.agents[j].coordinates.x])
                     ysegs.append([self.formation.graph.agents[i].coordinates.y,
                                   self.formation.graph.agents[j].coordinates.y])
+        self.aniagentshead.set_data(xh, yh)
         self.aniagents.set_data(x, y)
         self.linc.set_data(xsegs, ysegs)
-        return self.aniagents, self.linc,
+        return self.aniagents, self.linc, self.aniagentshead,
 
     def animate(self):
         ani = animation.FuncAnimation(self.fig, self.updateAnimation, frames=range(

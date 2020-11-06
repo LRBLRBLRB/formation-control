@@ -15,9 +15,9 @@ class control:
             self.graph.addagent(p=position(
                 random.uniform(-size[0], size[0]), random.uniform(-size[1], size[1])), dir=random.uniform(-pi, pi))
             # add target
-            a = agent(position(2*np.cos(i*np.pi*2/num),
-                               2*np.sin(i*np.pi*2/num)))
-            # a = agent(position(i, 0), 0)
+            # a = agent(position(2*np.cos(i*np.pi*2/num),
+            #                    2*np.sin(i*np.pi*2/num)))
+            a = agent(position(i-4.5, 0), 0)
             a.id = i
             self.target.append(a)
 
@@ -25,17 +25,14 @@ class control:
         self.graph.connectivity(delta)
         for i in range(self.graph.agentcount):
             ag = self.graph.agents[i]
-            #neigh = self.graph.getneighbors(i)
-            vect = target[ag.id].coordinates-ag.coordinates
-            v_forward = vect.length*k1
-            # w = -(ag.direction-target[ag.id].direction) * \
-            #     10 + atan2(vect.y, vect.x)
-            w = (atan2(vect.y, vect.x)-ag.direction) * k2
-            # for n in neigh:
-            #     v = v - ((ag.coordinates - n.coordinates) -
-            #              (target[ag.id].coordinates-target[n.id].coordinates))*k1
-            # v_forward = v_forward + \
-            #     (v.x*cos(ag.direction)+v.y*sin(ag.direction))
+            v = position(0, 0)
+            neigh = self.graph.getneighbors(i)
+            for n in neigh:
+                v = v - ((ag.coordinates - n.coordinates) -
+                         (target[ag.id].coordinates-target[n.id].coordinates))*k1
+            # v = target[ag.id].coordinates-ag.coordinates
+            v_forward = v.x*cos(ag.direction)+v.y*sin(ag.direction)
+            w = (-sin(ag.direction)*v.x+cos(ag.direction)*v.y)/ag.neck*k2
             print('w' + str(w))
             print('dir' + str(ag.direction))
             print('dird' + str(target[ag.id].direction))
