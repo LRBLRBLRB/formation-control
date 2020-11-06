@@ -17,7 +17,7 @@ class magui:
         self.ax.set_xlim([-self.size[0], self.size[0]])
         self.ax.set_ylim([-self.size[1], self.size[1]])
         self.formation = control()
-        self.formation.spawn(10,self.size)
+        self.formation.spawn(5, self.size)
 
     def initAnimation(self):
         x = [a.coordinates.x for a in self.formation.graph.agents]
@@ -27,7 +27,7 @@ class magui:
         return self.aniagents, self.linc,
 
     def updateAnimation(self, frame):
-        self.formation.servo(self.formation.target,delta = 3, k1 = 0.01, k2 = 0.1)
+        self.formation.servo(self.formation.target, delta=3, k1=0.5, k2=1)
         self.formation.printPos(self.size)
         x = [a.coordinates.x for a in self.formation.graph.agents]
         y = [a.coordinates.y for a in self.formation.graph.agents]

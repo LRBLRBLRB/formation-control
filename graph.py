@@ -9,8 +9,8 @@ class graph:
         self.agents = []
         self.adjmatrix = np.matrix([[0]])
 
-    def addagent(self, p):
-        a = agent(p)
+    def addagent(self, p, dir):
+        a = agent(p,dir)
         a.id = len(self.agents)
         self.agents.append(a)
         self.agentcount = len(self.agents)

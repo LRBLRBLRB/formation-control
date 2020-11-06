@@ -1,15 +1,16 @@
 import numpy as np
 import random
-from math import hypot
+from math import hypot, cos, sin, pi
+
 
 class position:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
-        self.length = hypot(self.x,self.y)
+        self.length = hypot(self.x, self.y)
 
     def __sub__(self, other):
-        return position(self.x-other.x, self.y-other.y)
+        return position(self.x - other.x, self.y - other.y)
 
     def __add__(self, other):
         return position(self.x + other.x, self.y + other.y)
@@ -20,17 +21,27 @@ class position:
     def __truediv__(self, rhs):
         return position(self.x / rhs, self.y / rhs)
 
-    def scaledown(self,scale):
-        if scale>1:
+    def scaledown(self, scale):
+        if scale > 1:
             self.x = self.x/scale
             self.y = self.y/scale
-        
-class agent:
-    def __init__(self, p=position()):
-        self.id = 0
-        self.coordinates = p
 
-    def step(self, v):
-        v.scaledown(v.length)
-        #print(str(self.id)+'s vel length: '+str(v.length))
-        self.coordinates = self.coordinates + v
+
+class agent:
+    def __init__(self, p=position(), dir=0):
+        self.id = 0
+        self.coordinates = p  # as in meters
+        self.direction = dir  # as in radian, x axis dir equal zero
+
+    def step(self, v, w, dt):
+        # print(str(self.id)+'s vel length: '+str(v.length))
+        self.coordinates.x = self.coordinates.x + \
+            v*cos(self.direction)*dt
+        self.coordinates.y = self.coordinates.y + \
+            v*sin(self.direction)*dt
+        self.direction = self.direction + w * dt
+
+        while self.direction > pi:
+            self.direction = self.direction-2*pi
+        while self.direction < -pi:
+            self.direction = self.direction+2*pi
