@@ -10,7 +10,6 @@ class magui:
     def __init__(self, figsize=[10, 10]):
         self.resolution = 1
         self.size = figsize
-        self.agents = []
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111)
         self.ax.set_xlim([0, self.size[0]])
@@ -33,18 +32,7 @@ class magui:
         return self.aniagents, self.linc,
 
     def updateAnimation(self, frame):
-        center = position()
-        for a in self.graph.agents:
-            center = center + a.coordinates
-        center = center/len(self.graph.agents)
-
-        for a in self.graph.agents:
-            delta = a.coordinates-center
-            if frame < 10:
-                delta = delta * 0.9
-            elif frame > 20 and frame < 30:
-                delta = delta * 1.1
-            a.coordinates = center+position(0.05, 0.05)+delta
+        self.graph.controller(frame)
         x = [a.coordinates.x for a in self.graph.agents]
         y = [a.coordinates.y for a in self.graph.agents]
         size = self.graph.adjmatrix.shape
@@ -62,7 +50,6 @@ class magui:
         return self.aniagents, self.linc,
 
     def animate(self):
-        self.agents.append(agent(p=position(random.random())))
         ani = animation.FuncAnimation(self.fig, self.updateAnimation, frames=range(
             0, 1000), init_func=self.initAnimation, interval=500, blit=True)
         plt.show()
