@@ -4,54 +4,50 @@ import numpy as np
 from agents import *
 from graph import *
 import random
+from formationcontrol import *
 
 
 class magui:
-    def __init__(self, figsize=[10, 10]):
+    def __init__(self, figsize=[5, 5]):
         self.resolution = 1
         self.size = figsize
         self.fig = plt.figure()
         self.ax = self.fig.add_subplot(111)
-        self.ax.set_xlim([0, self.size[0]])
-        self.ax.set_ylim([0, self.size[1]])
-        self.graph = graph()
-        self.graph.addagent(p=position(random.random(), random.random()+3))
-        self.graph.addagent(p=position(random.random()+0.5, random.random()+3))
-        self.graph.addagent(p=position(random.random()+1, random.random()+4))
-        self.graph.addagent(p=position(random.random()+1, random.random()+4))
-        self.graph.connect(0, 1)
-        self.graph.connect(1, 2)
-        self.graph.connect(2, 3)
-        self.graph.connect(0, 3)
+        self.ax.set_aspect(1)
+        self.ax.set_xlim([-self.size[0], self.size[0]])
+        self.ax.set_ylim([-self.size[1], self.size[1]])
+        self.formation = control()
+        self.formation.spawn(10,self.size)
 
     def initAnimation(self):
-        x = [a.coordinates.x for a in self.graph.agents]
-        y = [a.coordinates.y for a in self.graph.agents]
+        x = [a.coordinates.x for a in self.formation.graph.agents]
+        y = [a.coordinates.y for a in self.formation.graph.agents]
         self.aniagents, = self.ax.plot(x, y, 'ro', ms=8)
         self.linc, = self.ax.plot([])
         return self.aniagents, self.linc,
 
     def updateAnimation(self, frame):
-        self.graph.controller(frame)
-        x = [a.coordinates.x for a in self.graph.agents]
-        y = [a.coordinates.y for a in self.graph.agents]
-        size = self.graph.adjmatrix.shape
+        self.formation.servo(self.formation.target,delta = 3, k1 = 0.01, k2 = 0.1)
+        self.formation.printPos(self.size)
+        x = [a.coordinates.x for a in self.formation.graph.agents]
+        y = [a.coordinates.y for a in self.formation.graph.agents]
+        size = self.formation.graph.adjmatrix.shape
         xsegs = []
         ysegs = []
         for i in range(size[0]):
             for j in range(size[1]):
-                if self.graph.adjmatrix[i, j] == 1:
-                    xsegs.append([self.graph.agents[i].coordinates.x,
-                                  self.graph.agents[j].coordinates.x])
-                    ysegs.append([self.graph.agents[i].coordinates.y,
-                                  self.graph.agents[j].coordinates.y])
+                if self.formation.graph.adjmatrix[i, j] == 1:
+                    xsegs.append([self.formation.graph.agents[i].coordinates.x,
+                                  self.formation.graph.agents[j].coordinates.x])
+                    ysegs.append([self.formation.graph.agents[i].coordinates.y,
+                                  self.formation.graph.agents[j].coordinates.y])
         self.aniagents.set_data(x, y)
         self.linc.set_data(xsegs, ysegs)
         return self.aniagents, self.linc,
 
     def animate(self):
         ani = animation.FuncAnimation(self.fig, self.updateAnimation, frames=range(
-            0, 1000), init_func=self.initAnimation, interval=500, blit=True)
+            0, 1000), init_func=self.initAnimation, interval=100, blit=True)
         plt.show()
 
 

@@ -8,12 +8,12 @@ class graph:
     def __init__(self):
         self.agents = []
         self.adjmatrix = np.matrix([[0]])
-        self.center = position(0, 0)
 
     def addagent(self, p):
         a = agent(p)
         a.id = len(self.agents)
         self.agents.append(a)
+        self.agentcount = len(self.agents)
         if(a.id < 1):
             self.adjmatrix = np.matrix([[0]])
         else:
@@ -32,16 +32,21 @@ class graph:
             self.adjmatrix[i, j] = 0
             self.adjmatrix[j, i] = 0
 
-    def controller(self, frame):
-        center = position()
-        for a in self.agents:
-            center = center + a.coordinates
-        center = center/len(self.agents)
+    def connectivity(self, delta=1):
+        for i in range(self.agentcount):
+            for j in range(self.agentcount):
+                dis = (self.agents[i].coordinates - self.agents[j].coordinates)
+                dis = np.linalg.norm([dis.x, dis.y])
+                if dis < delta and dis > 0:
+                    self.adjmatrix[i, j] = 1
+                    self.adjmatrix[j, i] = 1
+                else:
+                    self.adjmatrix[i, j] = 0
+                    self.adjmatrix[j, i] = 0
 
-        for a in self.agents:
-            delta = a.coordinates-center
-            if frame < 10:
-                delta = delta * 0.9
-            elif frame > 20 and frame < 30:
-                delta = delta * 1.1
-            a.coordinates = center+position(0.0, 0.0)+delta
+    def getneighbors(self, id):
+        neigh = []
+        for i in range(self.agentcount):
+            if self.adjmatrix[id, i] == 1:
+                neigh.append(self.agents[i])
+        return neigh
