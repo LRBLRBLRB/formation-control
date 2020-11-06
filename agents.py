@@ -1,13 +1,14 @@
 import numpy as np
 import random
 
+
 class position:
-    def __init__(self,x=0,y=0):
+    def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
 
-    def __sub__(self,other):
-        return position(self.x-other.x,self.y-other.y)
+    def __sub__(self, other):
+        return position(self.x-other.x, self.y-other.y)
 
     def __add__(self, other):
         return position(self.x + other.x, self.y + other.y)
@@ -15,8 +16,8 @@ class position:
     def __mul__(self, other):
         return position(self.x * other, self.y * other)
 
-    def __div__(self, other):
-        return position(self.x / other, self.y / other)
+    def __truediv__(self, rhs):
+        return position(self.x / rhs, self.y / rhs)
 
 
 class agent:
@@ -24,6 +25,6 @@ class agent:
         self.id = 0
         self.coordinates = p
 
-    def step(self,v):
-        self.coordinates.x =self.coordinates.x + v[0]
-        self.coordinates.y =self.coordinates.y + v[1]
+    def step(self, v):
+        self.coordinates.x = self.coordinates.x + v[0]
+        self.coordinates.y = self.coordinates.y + v[1]
