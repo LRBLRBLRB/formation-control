@@ -22,26 +22,40 @@ class control:
             self.target.append(a)
 
     def servo(self, target, delta, k1, k2):
-        self.graph.connectivity(delta)
+        # self.graph.connectivity(delta)
+        # for i in range(self.graph.agentcount):
+        #     ag = self.graph.agents[i]
+        #     v = position(0, 0)
+        #     neigh = self.graph.getneighbors(i)
+        #     for n in neigh:
+        #         v = v - ((ag.coordinates - n.coordinates) -
+        #                  (target[ag.id].coordinates-target[n.id].coordinates))*k1
+        #     # v = target[ag.id].coordinates-ag.coordinates
+        #     v_forward = v.x*cos(ag.direction)+v.y*sin(ag.direction)
+        #     w = (-sin(ag.direction)*v.x+cos(ag.direction)*v.y)/ag.neck*k2
+        #     print('w' + str(w))
+        #     print('dir' + str(ag.direction))
+        #     print('dird' + str(target[ag.id].direction))
+
+        #     print('v_forward' + str(v_forward))
+        #     print('x: '+str(ag.coordinates.x)+'y: '+str(ag.coordinates.y))
+        #     print('xd: '+str(target[ag.id].coordinates.x) +
+        #           'yd: '+str(target[ag.id].coordinates.y))
+        #     ag.step(v_forward, w, 0.05)  # 0.05s
+        xd = np.mat(np.ones((self.graph.agentcount, 1)))
         for i in range(self.graph.agentcount):
             ag = self.graph.agents[i]
+            xd[i] = ag.coordinates.x
+        l = self.graph.agentcount * \
+            np.mat(np.eye(self.graph.agentcount, self.graph.agentcount)) - \
+            np.mat(np.ones((self.graph.agentcount, self.graph.agentcount)))
+        xout = -l * xd
+        for i in range(self.graph.agentcount):
             v = position(0, 0)
-            neigh = self.graph.getneighbors(i)
-            for n in neigh:
-                v = v - ((ag.coordinates - n.coordinates) -
-                         (target[ag.id].coordinates-target[n.id].coordinates))*k1
-            # v = target[ag.id].coordinates-ag.coordinates
-            v_forward = v.x*cos(ag.direction)+v.y*sin(ag.direction)
-            w = (-sin(ag.direction)*v.x+cos(ag.direction)*v.y)/ag.neck*k2
-            print('w' + str(w))
-            print('dir' + str(ag.direction))
-            print('dird' + str(target[ag.id].direction))
-
-            print('v_forward' + str(v_forward))
-            print('x: '+str(ag.coordinates.x)+'y: '+str(ag.coordinates.y))
-            print('xd: '+str(target[ag.id].coordinates.x) +
-                  'yd: '+str(target[ag.id].coordinates.y))
-            ag.step(v_forward, w, 0.05)  # 0.05s
+            v.x = xout[i]
+            ag = self.graph.agents[i]
+            v_forward, w = vxy2vw(v, ag.direction, ag.neck)
+            ag.step(v_forward*k1, w*k2, 0.05)
 
     def printPos(self, size):
         if self.graph.agentcount > 0:
@@ -50,3 +64,9 @@ class control:
         else:
             print('not initialized')
         pass
+
+
+def vxy2vw(v, dir, neck):
+    v_forward = v.x*cos(dir)+v.y*sin(dir)
+    w = (-sin(dir) * v.x + cos(dir) * v.y) / neck
+    return v_forward, w
