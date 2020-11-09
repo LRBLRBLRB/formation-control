@@ -14,7 +14,7 @@ class control:
     def spawn(self, num, size):
         for i in range(num):
             # self.graph.addagent(p=position(random.uniform(-size[0], size[0]), random.uniform(-size[1], size[1])), dir=random.uniform(-pi, pi))
-            self.graph.addagent(p=position(i / 5, 1 / 5 * math.pow(-1, i)), dir=pi / 2 * math.pow(-1, i) + pi / 2)
+            self.graph.addagent(p=position(i / 3, 1 / 5 * math.pow(-1, i)), dir=pi / 2 * math.pow(-1, i) + pi / 2)
             # add target
             # a = agent(position(2*np.cos(i*np.pi*2/num),
             #                    2*np.sin(i*np.pi*2/num)))
@@ -114,7 +114,7 @@ class control:
                     # 距离处于斥力区，需要对速度修正
                     col_id.append([i, j])
                     df = radius
-                    print('Collison:(' + str(i) + ',' + str(j) + ')')
+                    # print('Near:(' + str(i) + ',' + str(j) + ')')
                     self.change(i, j, rad_collison, df)
                 elif temp.length < rad_collison:
                     # 距离小于rad_collision，机器人急停
@@ -125,7 +125,7 @@ class control:
                     self.graph.agents[j].w = 0
 
     def change(self, i, j, rad_collision, df):
-        alpha1 = 50
+        alpha1 = 4
         alpha2 = 3
 
         agi = self.graph.agents[i]
@@ -145,12 +145,29 @@ class control:
         v_RR = np.dot(Rotate, v_RRL)
 
         cor_v, cor_w = vxy2vw(position(v_RR[0], v_RR[1]), theta, agi.neck)
-        gain = 5
+        gain = 1
         # print('correct:(' + str(cor_v) + ',' + str(cor_w) + ')')
         agi.v = agi.v + cor_v * gain
         agi.w = agi.w + cor_w * gain
-        # self.graph.agents[i].v = -self.graph.agents[i].v
-        # self.graph.agents[j].v = -self.graph.agents[j].v
+
+    def change2(self, i, j, rad_collision, df):
+        alpha = 0.5
+        agi = self.graph.agents[i]
+        agj = self.graph.agents[j]
+        deltaj = np.array([float(agj.coordinates.x - agi.coordinates.x),
+                           float(agj.coordinates.y - agi.coordinates.y)])
+        norm_rj = np.linalg.norm(deltaj)
+
+        ex = 5
+        cor_v = position(deltaj[0] / pow(norm_rj, ex) * alpha, deltaj[1] / pow(norm_rj, ex) * alpha)
+
+        cor_vi, cor_wi = vxy2vw(position(-cor_v.x, -cor_v.y), agi.direction, agi.neck)
+        agi.v = agi.v + cor_vi
+        agi.w = agi.w + cor_wi
+
+        cor_vj, cor_wj = vxy2vw(cor_v, agj.direction, agj.neck)
+        agj.v = agj.v + cor_vj
+        agj.w = agj.w + cor_wj
 
 
 def vxy2vw(v, dir, neck):
