@@ -17,7 +17,7 @@ class control:
             # add target
             # a = agent(position(2*np.cos(i*np.pi*2/num),
             #                    2*np.sin(i*np.pi*2/num)))
-            a = agent(position(i-4.5, 0), 0)
+            a = agent(position(i - 4.5, 0), 0)
             a.id = i
             self.target.append(a)
 
@@ -42,6 +42,8 @@ class control:
         #     print('xd: '+str(target[ag.id].coordinates.x) +
         #           'yd: '+str(target[ag.id].coordinates.y))
         #     ag.step(v_forward, w, 0.05)  # 0.05s
+
+        # 计算拉普拉斯矩阵，利用一致性协议进行下一步的计算，只控制x坐标一致
         xd = np.mat(np.ones((self.graph.agentcount, 1)))
         for i in range(self.graph.agentcount):
             ag = self.graph.agents[i]
@@ -50,13 +52,22 @@ class control:
             np.mat(np.eye(self.graph.agentcount, self.graph.agentcount)) - \
             np.mat(np.ones((self.graph.agentcount, self.graph.agentcount)))
         xout = -l * xd
+
+        # 将x方向的速度进行转换，转换为机器人运动的v_forward以及w
         for i in range(self.graph.agentcount):
             v = position(0, 0)
             v.x = xout[i]
             ag = self.graph.agents[i]
             v_forward, w = vxy2vw(v, ag.direction, ag.neck)
-            ag.step(v_forward*k1, w*k2, 0.05)
+            ag.v = v_forward
+            ag.w = w
+
+        # 对计算出的v_forward以及w进行碰撞检测并修正速度
         self.collision(0.05)
+
+        # 发送指令控制机器人前进
+        for i in range(self.graph.agentcount):
+            ag.step(v_forward * k1, w * k2, 0.05)
 
     def printPos(self, size):
         if self.graph.agentcount > 0:
@@ -67,6 +78,7 @@ class control:
         pass
 
     def collision(self, dt=0.05):
+
         # 碰撞检测,先计算下一时刻的位置，用mypos存储
         mypos = []
         nextpos = position()
@@ -81,6 +93,7 @@ class control:
 
             mypos[i].show(i)
 
+        # D为距离矩阵（上三角），判断两机器人是否过于接近，若是则用change函数改变机器人的v_forward以及w
         col_id = []
         D = np.zeros((num, num))
         for i in range(num - 1):
@@ -99,6 +112,6 @@ class control:
 
 
 def vxy2vw(v, dir, neck):
-    v_forward = v.x*cos(dir)+v.y*sin(dir)
+    v_forward = v.x * cos(dir) + v.y * sin(dir)
     w = (-sin(dir) * v.x + cos(dir) * v.y) / neck
     return v_forward, w
