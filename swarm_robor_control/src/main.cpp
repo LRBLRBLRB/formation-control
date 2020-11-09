@@ -11,6 +11,7 @@
 #include "vel_trans.h"
 #include <signal.h>
 #include "cmds.h"
+#include "agents.h"
 
 using namespace std;
 
@@ -65,13 +66,13 @@ int main(int argc, char ** argv)
         ros::Duration(0.5).sleep();
     }
 
-
+    agents agent[robot_num];
     for(int i=0 ;i<robot_num; i++)
     {
         /////初始化
-        x(i) = current_robot_pose[i][0];
-        y(i) = current_robot_pose[i][1];
-        theta(i) = current_robot_pose[i][2];
+        agent[i].x = current_robot_pose[i][0];
+        agent[i].y = current_robot_pose[i][1];
+        agent[i].dir = current_robot_pose[i][2];
     }
 
     while(!is_conv)
@@ -87,6 +88,7 @@ int main(int argc, char ** argv)
             std::vector<unsigned int> vec;
             
             cmds cmd(x_d[i],0,theta(i));
+            agent[i].set_vel(x_d[i],0);
             vec = swarm_move(cmd);
 
             std::cout << "robot_"<< current_robot_id[i]<< " v w: " << 0.0 << "  "<< cmd.w <<"   ";
