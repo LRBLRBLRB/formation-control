@@ -2,6 +2,7 @@ from agents import *
 from graph import *
 import numpy as np
 import random
+import math
 from math import pi, atan2
 
 
@@ -12,8 +13,8 @@ class control:
 
     def spawn(self, num, size):
         for i in range(num):
-            self.graph.addagent(p=position(
-                random.uniform(-size[0], size[0]), random.uniform(-size[1], size[1])), dir=random.uniform(-pi, pi))
+            # self.graph.addagent(p=position(random.uniform(-size[0], size[0]), random.uniform(-size[1], size[1])), dir=random.uniform(-pi, pi))
+            self.graph.addagent(p=position(i / 5, 1 / 5 * math.pow(-1, i)), dir=pi / 2 * math.pow(-1, i) + pi / 2)
             # add target
             # a = agent(position(2*np.cos(i*np.pi*2/num),
             #                    2*np.sin(i*np.pi*2/num)))
@@ -59,6 +60,7 @@ class control:
             v.x = xout[i]
             ag = self.graph.agents[i]
             v_forward, w = vxy2vw(v, ag.direction, ag.neck)
+            # ag.step(v_forward * k1, w * k2, 0.05)
             ag.v = v_forward
             ag.w = w
 
@@ -66,8 +68,10 @@ class control:
         self.collision(0.05)
 
         # 发送指令控制机器人前进
-        for i in range(self.graph.agentcount):
-            ag.step(v_forward * k1, w * k2, 0.05)
+        for j in range(self.graph.agentcount):
+            # ag.step(v_forward * k1, w * k2, 0.05)
+            ag = self.graph.agents[j]
+            ag.step(ag.v * k1, ag.w * k2, 0.05)
 
     def printPos(self, size):
         if self.graph.agentcount > 0:
@@ -90,23 +94,61 @@ class control:
                 ag.coordinates.x + ag.v * cos(ag.direction) * dt,
                 ag.coordinates.y + ag.v * sin(ag.direction) * dt
             ))
-
+            # 显示当前各个机器人姿态
             mypos[i].show(i)
 
         # D为距离矩阵（上三角），判断两机器人是否过于接近，若是则用change函数改变机器人的v_forward以及w
         col_id = []
         D = np.zeros((num, num))
+        rad_collison = 0.15
         for i in range(num - 1):
-            for j in range(i + 1, num - 1):
+            for j in range(num - 1):
+                # 不对自身进行碰撞检测
+                if j == i:
+                    continue
+
+                # 计算世界坐标系下两机器人的位置，记录进距离矩阵D
                 temp = mypos[i] - mypos[j]
                 D[i, j] = temp.length
-                if temp.length < radius:
+                if (temp.length < radius) and (temp.length > rad_collison):
+                    # 距离处于斥力区，需要对速度修正
                     col_id.append([i, j])
-                    print('(' + str(i) + ',' + str(j) + ')')
-                    self.change(i, j)
+                    df = radius
+                    print('Collison:(' + str(i) + ',' + str(j) + ')')
+                    self.change(i, j, rad_collison, df)
+                elif temp.length < rad_collison:
+                    # 距离小于rad_collision，机器人急停
+                    print('Collison:(' + str(i) + ',' + str(j) + ')' + 'Too close!Dis:' + str(temp.length))
+                    self.graph.agents[i].v = 0
+                    self.graph.agents[j].w = 0
+                    self.graph.agents[i].v = 0
+                    self.graph.agents[j].w = 0
 
-    def change(self, i, j):
-        pass
+    def change(self, i, j, rad_collision, df):
+        alpha1 = 50
+        alpha2 = 3
+
+        agi = self.graph.agents[i]
+        agj = self.graph.agents[j]
+
+        theta = float(agi.direction)
+
+        Rotate = np.array([[math.cos(theta), -math.sin(theta)],
+                           [math.sin(theta), math.cos(theta)]])
+
+        deltaj = np.array([float(agj.coordinates.x - agi.coordinates.x),
+                           float(agj.coordinates.y - agi.coordinates.y)])
+        rj = np.dot(np.transpose(Rotate), deltaj)
+        norm_rj = np.linalg.norm(rj)
+        v_RRL = -alpha1 * rj / norm_rj * ((1 / norm_rj - 1 / rad_collision) - (1 / df - 1 / rad_collision)) - \
+                alpha2 * rj / norm_rj * (df - norm_rj)
+        v_RR = np.dot(Rotate, v_RRL)
+
+        cor_v, cor_w = vxy2vw(position(v_RR[0], v_RR[1]), theta, agi.neck)
+        gain = 5
+        # print('correct:(' + str(cor_v) + ',' + str(cor_w) + ')')
+        agi.v = agi.v + cor_v * gain
+        agi.w = agi.w + cor_w * gain
         # self.graph.agents[i].v = -self.graph.agents[i].v
         # self.graph.agents[j].v = -self.graph.agents[j].v
 

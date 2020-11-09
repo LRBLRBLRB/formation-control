@@ -20,12 +20,21 @@ class magui:
         self.formation.spawn(5, self.size)
 
     def initAnimation(self):
-        x = [a.coordinates.x for a in self.formation.graph.agents]
-        y = [a.coordinates.y for a in self.formation.graph.agents]
-        self.aniagents, = self.ax.plot(x, y, 'ro', ms=8)
-        xh = [a.head.x for a in self.formation.graph.agents]
-        yh = [a.head.y for a in self.formation.graph.agents]
-        self.aniagentshead, = self.ax.plot(xh, yh, 'bo', ms=3)
+        x = []
+        y = []
+        for i in range(self.formation.graph.agentcount):
+            x.append(float(self.formation.graph.agents[i].coordinates.x))
+            y.append(float(self.formation.graph.agents[i].coordinates.y))
+        print(str(x) + ',' + str(y))
+        self.aniagents, = self.ax.plot(x, y, 'ro', ms=4)
+
+        xh=[]
+        yh=[]
+        for i in range(self.formation.graph.agentcount):
+            xh.append(float(self.formation.graph.agents[i].head.x))
+            yh.append(float(self.formation.graph.agents[i].head.y))
+
+        self.aniagentshead, = self.ax.plot(xh, yh, 'bo', ms=2)
         self.linc, = self.ax.plot([])
         return self.aniagents, self.linc, self.aniagentshead,
 

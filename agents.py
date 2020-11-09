@@ -41,7 +41,7 @@ class agent:
                      self.neck * sin(self.direction))
         self.v = 0
         self.w = 0
-        self.radius = 0.2
+        self.radius = 0.5
 
     def step(self, v, w, dt):
         # print(str(self.id)+'s vel length: '+str(v.length))
