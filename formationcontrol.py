@@ -56,6 +56,7 @@ class control:
             ag = self.graph.agents[i]
             v_forward, w = vxy2vw(v, ag.direction, ag.neck)
             ag.step(v_forward*k1, w*k2, 0.05)
+        self.collision(0.05)
 
     def printPos(self, size):
         if self.graph.agentcount > 0:
@@ -64,6 +65,37 @@ class control:
         else:
             print('not initialized')
         pass
+
+    def collision(self, dt=0.05):
+        # 碰撞检测,先计算下一时刻的位置，用mypos存储
+        mypos = []
+        nextpos = position()
+        num = self.graph.agentcount
+        radius = self.graph.agents[0].radius
+        for i in range(num):
+            ag = self.graph.agents[i]
+            mypos.append(position(
+                ag.coordinates.x + ag.v * cos(ag.direction) * dt,
+                ag.coordinates.y + ag.v * sin(ag.direction) * dt
+            ))
+
+            mypos[i].show(i)
+
+        col_id = []
+        D = np.zeros((num, num))
+        for i in range(num - 1):
+            for j in range(i + 1, num - 1):
+                temp = mypos[i] - mypos[j]
+                D[i, j] = temp.length
+                if temp.length < radius:
+                    col_id.append([i, j])
+                    print('(' + str(i) + ',' + str(j) + ')')
+                    self.change(i, j)
+
+    def change(self, i, j):
+        pass
+        # self.graph.agents[i].v = -self.graph.agents[i].v
+        # self.graph.agents[j].v = -self.graph.agents[j].v
 
 
 def vxy2vw(v, dir, neck):

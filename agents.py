@@ -24,7 +24,10 @@ class position:
     def scaledown(self, scale):
         if scale > 1:
             self.x = self.x/scale
-            self.y = self.y/scale
+            self.y = self.y / scale
+
+    def show(self, id):
+        print('Robot_id:' + str(id) + '(' + str(self.x) + ',' + str(self.y) + ')')
 
 
 class agent:
@@ -35,7 +38,10 @@ class agent:
         self.neck = 0.15
         self.head = self.coordinates + \
             position(self.neck*cos(self.direction),
-                     self.neck*sin(self.direction))
+                     self.neck * sin(self.direction))
+        self.v = 0
+        self.w = 0
+        self.radius = 0.2
 
     def step(self, v, w, dt):
         # print(str(self.id)+'s vel length: '+str(v.length))
