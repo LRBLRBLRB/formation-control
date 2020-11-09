@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="master_serial_num_" default="/dev/ttyUSB0" />
+    <arg name="baudrate_" default="9600" />
+    <arg name="time_out_" default="1000" />
+
+    <node pkg="serial_zigbee" type="serial_zigbee_node" name="serial_zigbee_node" output="screen">
+        <param name="master_serial_num_" type="string" value="$(arg master_serial_num_)" />
+        <param name="baudrate_" type="int" value="$(arg baudrate_)" />
+        <param name="time_out_" type="int" value="$(arg time_out_)" />
+   </node>
+
+</launch>

@@ -1,0 +1,9 @@
+#控制robot移动参数
+int32 robot_id
+int32 move_direction
+int32 speed_wheel_left
+int32 speed_wheel_right
+int32 time_span
+---
+bool success
+
