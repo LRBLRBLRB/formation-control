@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+
+    <!-- "修改串口参数"　-->
+    <arg name="master_serial_num" default="/dev/ttyUSB0" />
+    <arg name="baudrate" default="9600" />
+    <arg name="time_out" default="1000" />
+    <arg name="queue_move"  default="false"/>
+
+    <node pkg="swarm_robot_control" type="swarm_robot_control_node" name="swarm_robot_control_node" output="screen">
+        <param name="robot_num" type="int" value="3" />
+        <param name="queue_move" type="bool" value="$(arg queue_move)"/>
+    </node>
+
+    <include file="$(find serial_zigbee)/launch/serial_zigbee.launch" >
+        <arg name="master_serial_num_" value="$(arg master_serial_num)" />
+        <arg name="baudrate_" value="$(arg baudrate)" />
+        <arg name="time_out_" value="$(arg time_out)" />
+    </include>
+
+</launch>

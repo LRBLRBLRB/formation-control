@@ -1,0 +1,8 @@
+prefix=/home/aemc4/catkin_ws_multirobot/install
+
+Name: ddynamic_reconfigure
+Description: Description of ddynamic_reconfigure
+Version: 0.0.6
+Cflags: -I/home/aemc4/catkin_ws_multirobot/install/include
+Libs: -L/home/aemc4/catkin_ws_multirobot/install/lib -lddynamic_reconfigure
+Requires: dynamic_reconfigure message_runtime std_msgs

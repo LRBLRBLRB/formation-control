@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/aemc4/catkin_ws_multirobot/devel/setup.sh

@@ -59,8 +59,14 @@ class control:
             v = position(0, 0)
             v.x = xout[i]
             ag = self.graph.agents[i]
+
+            ag.vx = xout[i]
+            ag.vy = 0
+
             v_forward, w = vxy2vw(v, ag.direction, ag.neck)
+
             # ag.step(v_forward * k1, w * k2, 0.05)
+
             ag.v = v_forward
             ag.w = w
 
@@ -88,19 +94,18 @@ class control:
         nextpos = position()
         num = self.graph.agentcount
         radius = self.graph.agents[0].radius
+        print('*****************************')
         for i in range(num):
             ag = self.graph.agents[i]
             mypos.append(position(
                 ag.coordinates.x + ag.v * cos(ag.direction) * dt,
                 ag.coordinates.y + ag.v * sin(ag.direction) * dt
             ))
-            # 显示当前各个机器人姿态
-            mypos[i].show(i)
 
         # D为距离矩阵（上三角），判断两机器人是否过于接近，若是则用change函数改变机器人的v_forward以及w
         col_id = []
         D = np.zeros((num, num))
-        rad_collison = 0.15
+        rad_collison = 0.3
         for i in range(num - 1):
             for j in range(num - 1):
                 # 不对自身进行碰撞检测
@@ -123,9 +128,12 @@ class control:
                     self.graph.agents[j].w = 0
                     self.graph.agents[i].v = 0
                     self.graph.agents[j].w = 0
+        for i in range(num):
+            # 显示当前各个机器人姿态
+            self.graph.agents[i].show(i)
 
     def change(self, i, j, rad_collision, df):
-        alpha1 = 4
+        alpha1 = 40
         alpha2 = 3
 
         agi = self.graph.agents[i]
@@ -144,11 +152,18 @@ class control:
                 alpha2 * rj / norm_rj * (df - norm_rj)
         v_RR = np.dot(Rotate, v_RRL)
 
-        cor_v, cor_w = vxy2vw(position(v_RR[0], v_RR[1]), theta, agi.neck)
-        gain = 1
+        # print('correct_vx:(' + str(i)+','+str(agi.vx) + '+' + str(v_RR[0]) + ')')
+        # print('correct_vy:(' + str(agi.vy) + '+' + str(v_RR[1]) + ')')
+        agi.vx = agi.vx + v_RR[0]
+        agi.vy = agi.vy + v_RR[1]
+
+        agi.v, agi.w = vxy2vw(position(agi.vx, agi.vy), theta, agi.neck)
+
+        # cor_v, cor_w = vxy2vw(position(v_RR[0], v_RR[1]), theta, agi.neck)
+        # gain = 1
         # print('correct:(' + str(cor_v) + ',' + str(cor_w) + ')')
-        agi.v = agi.v + cor_v * gain
-        agi.w = agi.w + cor_w * gain
+        # agi.v = agi.v + cor_v * gain
+        # agi.w = agi.w + cor_w * gain
 
     def change2(self, i, j, rad_collision, df):
         alpha = 0.5

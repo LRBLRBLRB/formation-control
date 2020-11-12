@@ -23,11 +23,11 @@ class position:
 
     def scaledown(self, scale):
         if scale > 1:
-            self.x = self.x/scale
+            self.x = self.x / scale
             self.y = self.y / scale
 
     def show(self, id):
-        print('Robot_id:' + str(id) + '(' + str(self.x) + ',' + str(self.y) + ')')
+        print('Robot_position:' + str(id) + '(' + str(self.x) + ',' + str(self.y) + ')')
 
 
 class agent:
@@ -37,24 +37,32 @@ class agent:
         self.direction = dir  # as in radian, x axis dir equal zero
         self.neck = 0.15
         self.head = self.coordinates + \
-            position(self.neck*cos(self.direction),
-                     self.neck * sin(self.direction))
+                    position(self.neck * cos(self.direction),
+                             self.neck * sin(self.direction))
         self.v = 0
+
+        self.vx = 0
+        self.vy = 0
+
         self.w = 0
         self.radius = 0.7
 
     def step(self, v, w, dt):
         # print(str(self.id)+'s vel length: '+str(v.length))
         self.coordinates.x = self.coordinates.x + \
-            v*cos(self.direction)*dt
+                             v * cos(self.direction) * dt
         self.coordinates.y = self.coordinates.y + \
-            v*sin(self.direction)*dt
+                             v * sin(self.direction) * dt
         self.direction = self.direction + w * dt
 
         while self.direction > pi:
-            self.direction = self.direction-2*pi
+            self.direction = self.direction - 2 * pi
         while self.direction < -pi:
-            self.direction = self.direction+2*pi
+            self.direction = self.direction + 2 * pi
         self.head = self.coordinates + \
-            position(self.neck*cos(self.direction),
-                     self.neck*sin(self.direction))
+                    position(self.neck * cos(self.direction),
+                             self.neck * sin(self.direction))
+
+    def show(self, id):
+        self.coordinates.show(id)
+        print('Robot_velocity:' + str(id) + '(' + str(self.vx) + ',' + str(self.vy) + ')')
