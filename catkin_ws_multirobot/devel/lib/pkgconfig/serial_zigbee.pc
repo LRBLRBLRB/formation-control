@@ -1,8 +1,0 @@
-prefix=/home/aemc4/catkin_ws_multirobot/devel
-
-Name: serial_zigbee
-Description: Description of serial_zigbee
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/aemc4/catkin_ws_multirobot/devel/lib 
-Requires: roscpp serial std_msgs message_runtime universal_msgs

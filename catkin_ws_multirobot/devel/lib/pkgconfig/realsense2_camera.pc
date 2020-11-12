@@ -1,8 +1,0 @@
-prefix=/home/aemc4/catkin_ws_multirobot/devel
-
-Name: realsense2_camera
-Description: Description of realsense2_camera
-Version: 2.2.4
-Cflags: -I/home/aemc4/catkin_ws_multirobot/devel/include
-Libs: -L/home/aemc4/catkin_ws_multirobot/devel/lib -lrealsense2_camera
-Requires: message_runtime roscpp sensor_msgs std_msgs nodelet cv_bridge image_transport ddynamic_reconfigure nav_msgs

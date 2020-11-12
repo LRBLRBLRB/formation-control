@@ -1,8 +1,0 @@
-prefix=/home/aemc4/catkin_ws_multirobot/install
-
-Name: swarm_robot_control
-Description: Description of swarm_robot_control
-Version: 0.0.0
-Cflags: 
-Libs: -L/home/aemc4/catkin_ws_multirobot/install/lib 
-Requires: roscpp std_msgs tf serial message_runtime universal_msgs

@@ -1,2 +1,0 @@
-aruco_detection:realsense/ddynamic_reconfigure:realsense/realsense2_camera:serial_zigbee:swarm_robot_control:universal_msgs
--DCATKIN_DEVEL_PREFIX=/home/aemc4/catkin_ws_multirobot/devel -DCMAKE_INSTALL_PREFIX=/home/aemc4/catkin_ws_multirobot/install -G Unix Makefiles

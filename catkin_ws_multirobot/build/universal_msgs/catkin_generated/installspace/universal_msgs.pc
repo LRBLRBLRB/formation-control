@@ -1,8 +1,0 @@
-prefix=/home/aemc4/catkin_ws_multirobot/install
-
-Name: universal_msgs
-Description: Description of universal_msgs
-Version: 0.0.0
-Cflags: -I/home/aemc4/catkin_ws_multirobot/install/include
-Libs: -L/home/aemc4/catkin_ws_multirobot/install/lib 
-Requires: geometry_msgs roscpp std_msgs message_runtime
